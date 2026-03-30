@@ -5,27 +5,18 @@
   box-sizing: border-box;
 }
 
-/* ROOT */
-html, body {
-  height: 100%;
-}
-
-/* BODY BASE */
-body { 
-  display: flex;
-  justify-content: center;
-  align-items: center;
+/* BODY */
+body {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  font-family: system-ui, -apple-system, sans-serif;
+  color: white;
 }
 
 /* LINKS */
 a {
-  color: inherit;
+  color: #93c5fd;
   text-decoration: none;
-}
-
-/* BUTTON DEFAULT FIX */
-button {
-  font-family: inherit;
 }
 
 /* SCROLLBAR */
@@ -38,10 +29,8 @@ button {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #374151;
+  background: #3b82f6;
   border-radius: 10px;
 }
 
-* {
-  transition: all 0.15s ease;
-}
+

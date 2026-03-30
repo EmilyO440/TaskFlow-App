@@ -12,13 +12,11 @@ export default function App() {
   const [editingId, setEditingId] = useState(null);
   const [editText, setEditText] = useState("");
 
-  // Load from localStorage
   useEffect(() => {
     const saved = JSON.parse(localStorage.getItem("tasks"));
     if (saved) setTasks(saved);
   }, []);
 
-  // Save to localStorage
   useEffect(() => {
     localStorage.setItem("tasks", JSON.stringify(tasks));
   }, [tasks]);
@@ -77,7 +75,6 @@ export default function App() {
     return true;
   });
 
-  // Progress
   const completedCount = tasks.filter(t => t.completed).length;
   const progress = tasks.length
     ? Math.round((completedCount / tasks.length) * 100)
@@ -85,75 +82,101 @@ export default function App() {
 
   return (
     <div className="container">
-      <h1>TaskFlow</h1>
+      <div className="card">
 
-      {/* Progress */}
-      <div className="progress">
-        <p>{progress}% complete</p>
-        <progress value={progress} max="100"></progress>
+        <h1>TaskFlow</h1>
+        <p className="subtitle">
+          Organize tasks with priority and deadlines
+        </p>
+
+        <div className="progress-box">
+          <p>{progress}% complete</p>
+          <progress value={progress} max="100"></progress>
+        </div>
+
+        <form className="task-form" onSubmit={addTask}>
+          <input
+            value={task}
+            onChange={e => setTask(e.target.value)}
+            placeholder="Add a task..."
+          />
+
+          <select
+            value={priority}
+            onChange={e => setPriority(e.target.value)}
+          >
+            <option>Low</option>
+            <option>Medium</option>
+            <option>High</option>
+          </select>
+
+          <input
+            type="date"
+            value={dueDate}
+            onChange={e => setDueDate(e.target.value)}
+          />
+
+          <button>Add</button>
+        </form>
+
+        <div className="filters">
+          <button onClick={() => setFilter("all")}>All</button>
+          <button onClick={() => setFilter("active")}>Active</button>
+          <button onClick={() => setFilter("completed")}>Completed</button>
+          <button onClick={clearCompleted}>Clear</button>
+        </div>
+
+        {filteredTasks.length === 0 && (
+          <p className="empty">No tasks yet</p>
+        )}
+
+        <ul className="task-list">
+          {filteredTasks.map(t => (
+            <li
+              key={t.id}
+              className={`task ${t.completed ? "done" : ""} ${
+                t.dueDate && new Date(t.dueDate) < new Date() && !t.completed
+                  ? "overdue"
+                  : ""
+              }`}
+            >
+              {editingId === t.id ? (
+                <>
+                  <input
+                    value={editText}
+                    onChange={e => setEditText(e.target.value)}
+                  />
+                  <button onClick={saveEdit}>Save</button>
+                </>
+              ) : (
+                <>
+                  <div className="task-left">
+                    <span onClick={() => toggleTask(t.id)}>
+                      {t.text}
+                    </span>
+
+                    <div className="task-meta">
+                      <small className={`priority ${t.priority.toLowerCase()}`}>
+                        {t.priority}
+                      </small>
+
+                      {t.dueDate && (
+                        <small>{t.dueDate}</small>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="task-actions">
+                    <button onClick={() => startEdit(t)}>Edit</button>
+                    <button onClick={() => deleteTask(t.id)}>✕</button>
+                  </div>
+                </>
+              )}
+            </li>
+          ))}
+        </ul>
+
       </div>
-
-      {/* Add Task */}
-      <form onSubmit={addTask}>
-        <input
-          value={task}
-          onChange={e => setTask(e.target.value)}
-          placeholder="Add a task..."
-        />
-
-        <select value={priority} onChange={e => setPriority(e.target.value)}>
-          <option>Low</option>
-          <option>Medium</option>
-          <option>High</option>
-        </select>
-
-        <input
-          type="date"
-          value={dueDate}
-          onChange={e => setDueDate(e.target.value)}
-        />
-
-        <button>Add</button>
-      </form>
-
-      {/* Filters */}
-      <div className="filters">
-        <button onClick={() => setFilter("all")}>All</button>
-        <button onClick={() => setFilter("active")}>Active</button>
-        <button onClick={() => setFilter("completed")}>Completed</button>
-        <button onClick={clearCompleted}>Clear Completed</button>
-      </div>
-
-      {/* Task List */}
-      <ul>
-        {filteredTasks.map(t => (
-          <li key={t.id} className={t.completed ? "done" : ""}>
-            
-            {editingId === t.id ? (
-              <>
-                <input
-                  value={editText}
-                  onChange={e => setEditText(e.target.value)}
-                />
-                <button onClick={saveEdit}>Save</button>
-              </>
-            ) : (
-              <>
-                <span onClick={() => toggleTask(t.id)}>
-                  {t.text}
-                </span>
-
-                <small> [{t.priority}] </small>
-                {t.dueDate && <small> ({t.dueDate}) </small>}
-
-                <button onClick={() => startEdit(t)}>Edit</button>
-                <button onClick={() => deleteTask(t.id)}>❌</button>
-              </>
-            )}
-
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }
